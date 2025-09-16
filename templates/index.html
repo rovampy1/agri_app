@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 AgriNews AI - Smart Agriculture News</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #45a049, #2196F3);
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .article-header {
+            margin-bottom: 15px;
+        }
+
+        .source-tag {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .article-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .article-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .summary-label {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-icon {
+            font-size: 1.2em;
+        }
+
+        .summary-text {
+            line-height: 1.6;
+            color: #34495e;
+        }
+
+        .article-description {
+            color: #5a6c7d;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+
+        .article-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .stats {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 20px;
+            color: white;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .article-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌾 AgriNews AI</h1>
+            <p>Smart Agriculture News with AI-Powered Summaries</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="fetchArticles()">
+                🔄 Fetch Latest News
+            </button>
+            <button class="btn btn-secondary" onclick="loadArticles()">
+                📰 Load Saved Articles
+            </button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>🤖 Fetching articles and generating AI summaries...</p>
+        </div>
+
+        <div id="stats" class="stats" style="display: none;">
+            <h3>📊 Statistics</h3>
+            <div class="stat-item">
+                <span class="stat-number" id="totalArticles">0</span>
+                <span>Articles</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="totalSources">0</span>
+                <span>Sources</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="lastUpdated">--</span>
+                <span>Last Updated</span>
+            </div>
+        </div>
+
+        <div id="error" class="error-message" style="display: none;"></div>
+        
+        <div id="articles" class="articles-grid"></div>
+    </div>
+
+    <!-- Update the controls section in your HTML -->
+<div class="controls">
+    <button class="btn btn-primary" onclick="fetchArticles()">
+        🔄 Fetch Latest News
+    </button>
+    <button class="btn btn-secondary" onclick="loadArticles()">
+        📰 Load Saved Articles
+    </button>
+    <button class="btn btn-secondary" onclick="testAI()">
+        🤖 Test AI Service
+    </button>
+</div>
+
+
+    <script>
+        async function fetchArticles() {
+            const loading = document.getElementById('loading');
+            const articlesDiv = document.getElementById('articles');
+            const errorDiv = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            articlesDiv.innerHTML = '';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/fetch');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    displayArticles(result.data);
+                } else {
+                    throw new Error(result.error || 'Failed to fetch articles');
+                }
+            } catch (error) {
+                showError('Error fetching articles: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function loadArticles() {
+            const loading = document.getElementById('loading');
+            const articlesDiv = document.getElementById('articles');
+            const errorDiv = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            articlesDiv.innerHTML = '';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/articles');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayArticles(data);
+                } else {
+                    throw new Error(data.error || 'Failed to load articles');
+                }
+            } catch (error) {
+                showError('Error loading articles: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayArticles(data) {
+            const articlesDiv = document.getElementById('articles');
+            const statsDiv = document.getElementById('stats');
+            
+            // Update statistics
+            document.getElementById('totalArticles').textContent = data.total_articles;
+            document.getElementById('totalSources').textContent = data.feeds.length;
+            
+            const fetchTime = new Date(data.fetch_timestamp);
+            document.getElementById('lastUpdated').textContent = fetchTime.toLocaleTimeString();
+            
+            statsDiv.style.display = 'block';
+            
+            // Clear previous articles
+            articlesDiv.innerHTML = '';
+            
+            // Display articles from all feeds
+            data.feeds.forEach(feed => {
+                feed.articles.forEach(article => {
+                    const articleCard = createArticleCard(article);
+                    articlesDiv.appendChild(articleCard);
+                });
+            });
+        }
+
+        function createArticleCard(article) {
+            const card = document.createElement('div');
+            card.className = 'article-card';
+            
+            const publishedDate = article.date ? new Date(article.date).toLocaleDateString() : 'Unknown date';
+            
+            card.innerHTML = `
+                <div class="article-header">
+                    <span class="source-tag">${article.source}</span>
+                    <h3 class="article-title">${article.title}</h3>
+                    <p class="article-date">📅 ${publishedDate}</p>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="summary-label">
+                        <span class="ai-icon">🤖</span>
+                        <span>AI Summary</span>
+                    </div>
+                    <p class="summary-text">${article.ai_summary}</p>
+                </div>
+                
+                ${article.description ? `<p class="article-description">${article.description}</p>` : ''}
+                
+                <div class="article-footer">
+                    <a href="${article.url}" target="_blank" class="read-more">
+                        📖 Read Full Article
+                    </a>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Load articles on page load
+        window.addEventListener('load', loadArticles);
+
+        // Add this function to your JavaScript section
+async function testAI() {
+    const errorDiv = document.getElementById('error');
+    errorDiv.style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/test-ai');
+        const result = await response.json();
+        
+        let message = `🔍 AI Service Test Results:\n`;
+        message += `API Key Set: ${result.api_key_set ? '✅ Yes' : '❌ No'}\n`;
+        message += `API Working: ${result.api_working ? '✅ Yes' : '❌ No'}\n`;
+        message += `Message: ${result.message}`;
+        
+        alert(message);
+        
+        if (!result.api_working) {
+            showError(`AI Service Issue: ${result.message}`);
+        }
+    } catch (error) {
+        showError('Error testing AI service: ' + error.message);
+    }
+}
+
+    </script>
+</body>
+</html>

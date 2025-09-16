@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ Agri News Reels</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .reels-container {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .reel {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            scroll-snap-align: start;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .reel:nth-child(even) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .reel:nth-child(3n) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .reel:nth-child(4n) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .reel:nth-child(5n) {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        /* Header */
+        .reel-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            padding: 50px 20px 20px;
+            z-index: 10;
+        }
+
+        .reel-number {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .source-badge {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Main content */
+        .reel-content {
+            flex: 1;
+            padding: 120px 20px 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .reel-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .ai-summary-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .ai-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .ai-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .summary-text {
+            font-size: 1.1em;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.95);
+        }
+
+        /* Footer controls */
+        .reel-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            padding: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .read-more-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+        }
+
+        /* Side controls */
+        .side-controls {
+            position: fixed;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .side-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .side-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 30;
+        }
+
+        .progress-dot {
+            width: 4px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #fff;
+            height: 30px;
+        }
+
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Floating controls */
+        .floating-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 25;
+        }
+
+        .control-btn {
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .reel-title {
+                font-size: 1.5em;
+            }
+            
+            .reel-content {
+                padding: 100px 15px 80px;
+            }
+            
+            .floating-controls {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <h2>🏛️ Loading Agri News Reels</h2>
+        <p>Fetching latest government agriculture news...</p>
+    </div>
+
+    <!-- Floating Controls -->
+    <div class="floating-controls">
+        <button class="control-btn" onclick="fetchNewReels()">🔄 Refresh</button>
+        <button class="control-btn" onclick="toggleAutoScroll()" id="autoScrollBtn">⏸️ Auto</button>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div id="progressIndicator" class="progress-indicator"></div>
+
+    <!-- Side Controls -->
+    <div class="side-controls">
+        <button class="side-btn" onclick="scrollToTop()">⬆️</button>
+        <button class="side-btn" onclick="scrollToNext()">⬇️</button>
+        <button class="side-btn" onclick="shareArticle()" id="shareBtn">📤</button>
+    </div>
+
+    <!-- Reels Container -->
+    <div id="reelsContainer" class="reels-container"></div>
+
+    <script>
+        let articles = [];
+        let currentReelIndex = 0;
+        let autoScrollInterval = null;
+        let isAutoScrolling = false;
+
+        // Initialize the app
+        async function initApp() {
+            try {
+                await loadSavedArticles();
+                if (articles.length === 0) {
+                    await fetchNewReels();
+                }
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                showError('Failed to load articles. Please try refreshing.');
+            }
+        }
+
+        // Fetch new articles
+        async function fetchNewReels() {
+            showLoading(true);
+            try {
+                const response = await fetch('/api/fetch-top-10');
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data.articles) {
+                    articles = result.data.articles;
+                    renderReels();
+                    hideLoading();
+                } else {
+                    throw new Error(result.error || 'Failed to fetch articles');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Error fetching articles: ' + error.message);
+            }
+        }
+
+        // Load saved articles
+        async function loadSavedArticles() {
+            try {
+                const response = await fetch('/api/articles');
+                const data = await response.json();
+                
+                if (response.ok && data.articles && data.articles.length > 0) {
+                    articles = data.articles;
+                    renderReels();
+                    hideLoading();
+                }
+            } catch (error) {
+                console.error('No saved articles found');
+            }
+        }
+
+        // Render reels
+        function renderReels() {
+            const container = document.getElementById('reelsContainer');
+            const progressIndicator = document.getElementById('progressIndicator');
+            
+            container.innerHTML = '';
+            progressIndicator.innerHTML = '';
+
+            articles.forEach((article, index) => {
+                // Create reel element
+                const reel = document.createElement('div');
+                reel.className = 'reel';
+                reel.id = `reel-${index}`;
+                
+                reel.innerHTML = `
+                    <div class="reel-header">
+                        <div class="reel-number">${article.id || index + 1}</div>
+                        <div class="source-badge">🏛️ ${article.source}</div>
+                    </div>
+                    
+                    <div class="reel-content">
+                        <h2 class="reel-title">${article.title}</h2>
+                        
+                        <div class="ai-summary-box">
+                            <div class="ai-label">
+                                <div class="ai-icon">🤖</div>
+                                <span>AI Policy Summary</span>
+                            </div>
+                            <p class="summary-text">${article.ai_summary}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="reel-footer">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="likeArticle(${index})">
+                                ❤️ Like
+                            </button>
+                            <button class="action-btn" onclick="saveArticle(${index})">
+                                🔖 Save
+                            </button>
+                            <a href="${article.url}" target="_blank" class="action-btn read-more-btn">
+                                📖 Read More
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(reel);
+                
+                // Create progress dot
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (index === 0) dot.classList.add('active');
+                progressIndicator.appendChild(dot);
+            });
+
+            // Setup scroll listener
+            setupScrollListener();
+            updateProgressIndicator();
+        }
+
+        // Setup scroll listener
+        function setupScrollListener() {
+            const container = document.getElementById('reelsContainer');
+            let timeout;
+            
+            container.addEventListener('scroll', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    updateCurrentReel();
+                    updateProgressIndicator();
+                }, 150);
+            });
+        }
+
+        // Update current reel index
+        function updateCurrentReel() {
+            const container = document.getElementById('reelsContainer');
+            const reelHeight = window.innerHeight;
+            const scrollTop = container.scrollTop;
+            currentReelIndex = Math.round(scrollTop / reelHeight);
+        }
+
+        // Update progress indicator
+        function updateProgressIndicator() {
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentReelIndex);
+            });
+        }
+
+        // Navigation functions
+        function scrollToNext() {
+            if (currentReelIndex < articles.length - 1) {
+                currentReelIndex++;
+                scrollToReel(currentReelIndex);
+            }
+        }
+
+        function scrollToTop() {
+            currentReelIndex = 0;
+            scrollToReel(0);
+        }
+
+        function scrollToReel(index) {
+            const container = document.getElementById('reelsContainer');
+            container.scrollTo({
+                top: index * window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // Auto scroll functionality
+        function toggleAutoScroll() {
+            const btn = document.getElementById('autoScrollBtn');
+            
+            if (isAutoScrolling) {
+                clearInterval(autoScrollInterval);
+                isAutoScrolling = false;
+                btn.textContent = '▶️ Auto';
+            } else {
+                autoScrollInterval = setInterval(() => {
+                    if (currentReelIndex < articles.length - 1) {
+                        scrollToNext();
+                    } else {
+                        scrollToTop();
+                    }
+                }, 5000); // 5 seconds per reel
+                
+                isAutoScrolling = true;
+                btn.textContent = '⏸️ Auto';
+            }
+        }
+
+        // Action functions
+        function likeArticle(index) {
+            const btn = event.target;
+            btn.style.background = '#ff6b6b';
+            btn.textContent = '❤️ Liked!';
+            setTimeout(() => {
+                btn.style.background = '';
+                btn.textContent = '❤️ Like';
+            }, 2000);
+        }
+
+        function saveArticle(index) {
+            const btn = event.target;
+            btn.style.background = '#4CAF50';
+            btn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                btn.style.background = '';
+                btn.textContent = '🔖 Save';
+            }, 2000);
+        }
+
+        function shareArticle() {
+            if (articles[currentReelIndex]) {
+                const article = articles[currentReelIndex];
+                if (navigator.share) {
+                    navigator.share({
+                        title: article.title,
+                        text: article.ai_summary,
+                        url: article.url
+                    });
+                } else {
+                    navigator.clipboard.writeText(article.url);
+                    alert('Article link copied to clipboard!');
+                }
+            }
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.style.display = show ? 'flex' : 'none';
+        }
+
+        function hideLoading() {
+            showLoading(false);
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+
+        // Touch gestures for mobile
+        let startY = 0;
+        let startX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            startX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const endY = e.changedTouches[0].clientY;
+            const endX = e.changedTouches[0].clientX;
+            const deltaY = startY - endY;
+            const deltaX = Math.abs(startX - endX);
+
+            // Vertical swipe detection
+            if (Math.abs(deltaY) > 50 && deltaX < 100) {
+                if (deltaY > 0) {
+                    // Swipe up - next reel
+                    scrollToNext();
+                } else {
+                    // Swipe down - previous reel
+                    if (currentReelIndex > 0) {
+                        currentReelIndex--;
+                        scrollToReel(currentReelIndex);
+                    }
+                }
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowDown':
+                case ' ':
+                    e.preventDefault();
+                    scrollToNext();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentReelIndex > 0) {
+                        currentReelIndex--;
+                        scrollToReel(currentReelIndex);
+                    }
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    scrollToTop();
+                    break;
+            }
+        });
+
+        // Initialize app when page loads
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
